@@ -92,11 +92,23 @@ namespace SapNwRfc.Internal.Interop
         public virtual RfcResultCode DestroyFunction(IntPtr funcHandle, out RfcErrorInfo errorInfo)
             => RfcDestroyFunction(funcHandle, out errorInfo);
 
-        [DllImport(SapNwRfcDllName, CharSet = CharSet.Unicode)]
-        private static extern RfcResultCode RfcGetParameterDescByName(IntPtr funcDescHandle, string parameterName, out IntPtr parameterDescHandle, out RfcErrorInfo errorInfo);
+        [DllImport(SapNwRfcDllName)]
+        private static extern RfcResultCode RfcGetParameterCount(IntPtr funcDesc, out uint count, out RfcErrorInfo errorInfo);
 
-        public virtual RfcResultCode GetParameterDescByName(IntPtr funcDescHandle, string parameterName, out IntPtr parameterDescHandle, out RfcErrorInfo errorInfo)
-            => RfcGetParameterDescByName(funcDescHandle, parameterName, out parameterDescHandle, out errorInfo);
+        public virtual RfcResultCode GetParameterCount(IntPtr funcDesc, out uint count, out RfcErrorInfo errorInfo)
+            => RfcGetParameterCount(funcDesc, out count, out errorInfo);
+
+        [DllImport(SapNwRfcDllName, CharSet = CharSet.Unicode)]
+        private static extern RfcResultCode RfcGetParameterDescByIndex(IntPtr funcDesc, uint index, out RfcParameterDescription paramDesc, out RfcErrorInfo errorInfo);
+
+        public virtual RfcResultCode GetParameterDescByIndex(IntPtr funcDesc, uint index, out RfcParameterDescription paramDesc, out RfcErrorInfo errorInfo)
+            => RfcGetParameterDescByIndex(funcDesc, index, out paramDesc, out errorInfo);
+
+        [DllImport(SapNwRfcDllName, CharSet = CharSet.Unicode)]
+        private static extern RfcResultCode RfcGetParameterDescByName(IntPtr funcDesc, string name, out RfcParameterDescription paramDesc, out RfcErrorInfo errorInfo);
+
+        public virtual RfcResultCode GetParameterDescByName(IntPtr funcDesc, string name, out RfcParameterDescription paramDesc, out RfcErrorInfo errorInfo)
+            => RfcGetParameterDescByName(funcDesc, name, out paramDesc, out errorInfo);
 
         [DllImport(SapNwRfcDllName)]
         private static extern RfcResultCode RfcInvoke(IntPtr rfcHandle, IntPtr funcHandle, out RfcErrorInfo errorInfo);
@@ -241,10 +253,40 @@ namespace SapNwRfc.Internal.Interop
             => RfcMoveToFirstRow(tableHandle, out errorInfo);
 
         [DllImport(SapNwRfcDllName)]
+        private static extern RfcResultCode RfcMoveTo(IntPtr tableHandle, uint index, out RfcErrorInfo errorInfo);
+
+        public virtual RfcResultCode MoveTo(IntPtr tableHandle, uint index, out RfcErrorInfo errorInfo)
+            => RfcMoveTo(tableHandle, index, out errorInfo);
+
+        [DllImport(SapNwRfcDllName)]
         private static extern IntPtr RfcAppendNewRow(IntPtr tableHandle, out RfcErrorInfo errorInfo);
 
         public virtual IntPtr AppendNewRow(IntPtr tableHandle, out RfcErrorInfo errorInfo)
             => RfcAppendNewRow(tableHandle, out errorInfo);
+
+        [DllImport(SapNwRfcDllName)]
+        private static extern IntPtr RfcDescribeType(IntPtr dataHandle, out RfcErrorInfo errorInfo);
+
+        public virtual IntPtr DescribeType(IntPtr dataHandle, out RfcErrorInfo errorInfo)
+            => RfcDescribeType(dataHandle, out errorInfo);
+
+        [DllImport(SapNwRfcDllName)]
+        private static extern RfcResultCode RfcGetFieldCount(IntPtr typeHandle, out uint count, out RfcErrorInfo errorInfo);
+
+        public virtual RfcResultCode GetFieldCount(IntPtr typeHandle, out uint count, out RfcErrorInfo errorInfo)
+            => RfcGetFieldCount(typeHandle, out count, out errorInfo);
+
+        [DllImport(SapNwRfcDllName, CharSet = CharSet.Unicode)]
+        private static extern RfcResultCode RfcGetFieldDescByName(IntPtr typeHandle, string name, out RfcFieldDescription fieldDesc, out RfcErrorInfo errorInfo);
+
+        public virtual RfcResultCode GetFieldDescByName(IntPtr typeHandle, string name, out RfcFieldDescription fieldDesc, out RfcErrorInfo errorInfo)
+            => RfcGetFieldDescByName(typeHandle, name, out fieldDesc, out errorInfo);
+
+        [DllImport(SapNwRfcDllName, CharSet = CharSet.Unicode)]
+        private static extern RfcResultCode RfcGetFieldDescByIndex(IntPtr typeHandle, uint index, out RfcFieldDescription fieldDesc, out RfcErrorInfo errorInfo);
+
+        public virtual RfcResultCode GetFieldDescByIndex(IntPtr typeHandle, uint index, out RfcFieldDescription fieldDesc, out RfcErrorInfo errorInfo)
+            => RfcGetFieldDescByIndex(typeHandle, index, out fieldDesc, out errorInfo);
 
         #endregion
 

@@ -1,5 +1,6 @@
 using System;
 using SapNwRfc.Internal;
+using SapNwRfc.Internal.Dynamic;
 using SapNwRfc.Internal.Interop;
 
 namespace SapNwRfc
@@ -60,9 +61,9 @@ namespace SapNwRfc
         public bool HasParameter(string parameterName)
         {
             RfcResultCode resultCode = _interop.GetParameterDescByName(
-                funcDescHandle: _functionDescriptionHandle,
-                parameterName: parameterName,
-                parameterDescHandle: out IntPtr parameterDescHandle,
+                funcDesc: _functionDescriptionHandle,
+                name: parameterName,
+                paramDesc: out RfcParameterDescription parameterDescHandle,
                 errorInfo: out RfcErrorInfo errorInfo);
 
             return resultCode == RfcResultCode.RFC_OK;
@@ -92,6 +93,11 @@ namespace SapNwRfc
         {
             Invoke();
 
+            if (typeof(TOutput) == typeof(object))
+            {
+                return (TOutput)(object)new DynamicRfcFunction(_interop, _functionHandle, _functionDescriptionHandle);
+            }
+
             return OutputMapper.Extract<TOutput>(_interop, _functionHandle);
         }
 
@@ -99,6 +105,11 @@ namespace SapNwRfc
         public TOutput Invoke<TOutput>(object input)
         {
             Invoke(input);
+
+            if (typeof(TOutput) == typeof(object))
+            {
+                return (TOutput)(object)new DynamicRfcFunction(_interop, _functionHandle, _functionDescriptionHandle);
+            }
 
             return OutputMapper.Extract<TOutput>(_interop, _functionHandle);
         }

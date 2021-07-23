@@ -173,14 +173,28 @@ class SomeFunctionResult
 }
 ```
 
+### Call function with dynamic input and output parameters
+
+```csharp
+using var someFunction = connection.CreateFunction("BAPI_SOME_FUNCTION_NAME");
+var result = someFunction.Invoke<dynamic>(new
+{
+    SOME_FIELD = "Some value",
+});
+
+string abc = result.RES_ABC;
+```
+
 ### RFC Server Generic Handler
 
 ```csharp
 string connectionString = "AppServerHost=MY_SERVER_HOST; SystemNumber=00; User=MY_SAP_USER; Password=SECRET; Client=100; Language=EN; PoolSize=5; Trace=8";
 
-SapServer.InstallGenericServerFunctionHandler(connectionString, function =>
+SapServer.InstallGenericServerFunctionHandler(connectionString, (connection, function) =>
 {
-    switch (function.Name)
+    var attributes = connection.GetAttributes();
+
+    switch (function.GetName())
     {
         case "BAPI_SOME_FUNCTION_NAME":
             var parameters = function.GetParameters<SomeFunctionParameters>();

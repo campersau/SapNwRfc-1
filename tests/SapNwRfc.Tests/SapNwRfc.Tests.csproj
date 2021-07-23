@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net472;net5</TargetFrameworks>
@@ -40,6 +40,10 @@
     <None Include="..\..\Signing.snk">
       <Link>Signing.snk</Link>
     </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
 </Project>
