@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using SapNwRfc.Exceptions;
@@ -10,8 +9,6 @@ namespace SapNwRfc.Pooling
     /// </summary>
     public sealed class SapPooledConnection : ISapPooledConnection
     {
-        private readonly List<ISapFunction> _functions = new List<ISapFunction>();
-
         private readonly ISapConnectionPool _pool;
         private ISapConnection _connection = null;
         private bool _disposed = false;
@@ -41,13 +38,6 @@ namespace SapNwRfc.Pooling
         {
             if (_disposed)
                 return;
-
-            // manually dispose any open function on current connection
-            // when it gets returned to pool
-            foreach (ISapFunction function in _functions)
-            {
-                function.Dispose();
-            }
 
             if (_connection != null)
             {
@@ -109,13 +99,8 @@ namespace SapNwRfc.Pooling
 
             try
             {
-                // no using here to prevent function from being disposed
-                // when possibly an IEnumerable is used in TOutput
-                // and rows are accessed after InvokeFunction
-                ISapFunction function = _connection.CreateFunction(name);
-                _functions.Add(function);
-
-                return function.Invoke<TOutput>();
+                using (ISapFunction function = _connection.CreateFunction(name))
+                    return function.Invoke<TOutput>();
             }
             catch (SapCommunicationFailedException)
             {
@@ -124,11 +109,8 @@ namespace SapNwRfc.Pooling
 
                 // Retry invocation with new connection from the pool
                 _connection = _pool.GetConnection(cancellationToken);
-
-                ISapFunction function = _connection.CreateFunction(name);
-                _functions.Add(function);
-
-                return function.Invoke<TOutput>();
+                using (ISapFunction function = _connection.CreateFunction(name))
+                    return function.Invoke<TOutput>();
             }
         }
 
@@ -139,13 +121,8 @@ namespace SapNwRfc.Pooling
 
             try
             {
-                // no using here to prevent function from being disposed
-                // when possibly an IEnumerable is used in TOutput
-                // and rows are accessed after InvokeFunction
-                ISapFunction function = _connection.CreateFunction(name);
-                _functions.Add(function);
-
-                return function.Invoke<TOutput>(input);
+                using (ISapFunction function = _connection.CreateFunction(name))
+                    return function.Invoke<TOutput>(input);
             }
             catch (SapCommunicationFailedException)
             {
@@ -154,11 +131,8 @@ namespace SapNwRfc.Pooling
 
                 // Retry invocation with new connection from the pool
                 _connection = _pool.GetConnection(cancellationToken);
-
-                ISapFunction function = _connection.CreateFunction(name);
-                _functions.Add(function);
-
-                return function.Invoke<TOutput>(input);
+                using (ISapFunction function = _connection.CreateFunction(name))
+                    return function.Invoke<TOutput>(input);
             }
         }
     }
